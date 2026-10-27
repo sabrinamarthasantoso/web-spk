@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Data Anak | Ruang Arah</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <div class="brand">
+                Ruang Arah
+                <small>SPK Strategi Pengajaran ABK</small>
+            </div>
+
+            <a href="{{ url_for('data_anak') }}" class="back-link">
+                ← Kembali ke Data Anak
+            </a>
+        </div>
+    </header>
+
+    <main class="container main">
+        <p class="eyebrow">Pengelolaan Data</p>
+
+        <h1>Edit Data Anak</h1>
+
+        <p class="description">
+            Perbarui informasi anak yang sudah tersimpan
+            dalam database.
+        </p>
+
+        <section class="form-card">
+            <div class="form-heading">
+                <h2>Informasi Anak</h2>
+                <p>Periksa kembali data sebelum menyimpan perubahan.</p>
+            </div>
+
+            {% if pesan_error %}
+                <div class="error-box" role="alert">
+                    {{ pesan_error }}
+                </div>
+            {% endif %}
+
+            <form
+                action="{{ url_for('edit_anak', anak_id=anak.id) }}"
+                method="POST"
+            >
+                <div class="form-group">
+                    <label for="kode_anak">Kode Anak</label>
+
+                    <input
+                        type="text"
+                        id="kode_anak"
+                        name="kode_anak"
+                        maxlength="20"
+                        required
+                        value="{{ request.form.get('kode_anak', anak.kode_anak) }}"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="nama_panggilan">Nama Panggilan</label>
+
+                    <input
+                        type="text"
+                        id="nama_panggilan"
+                        name="nama_panggilan"
+                        maxlength="50"
+                        required
+                        value="{{ request.form.get('nama_panggilan', anak.nama_panggilan) }}"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="tanggal_lahir">Tanggal Lahir</label>
+
+                    <input
+                        type="date"
+                        id="tanggal_lahir"
+                        name="tanggal_lahir"
+                        required
+                        value="{{ request.form.get('tanggal_lahir', anak.tanggal_lahir.strftime('%Y-%m-%d')) }}"
+                    >
+                </div>
+
+                <div class="form-actions">
+                    <a
+                        href="{{ url_for('data_anak') }}"
+                        class="button-secondary"
+                    >
+                        Batal
+                    </a>
+
+                    <button type="submit" class="button-primary">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

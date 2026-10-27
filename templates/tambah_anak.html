@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tambah Data Anak | Ruang Arah</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <div class="brand">
+                Ruang Arah
+                <small>SPK Strategi Pengajaran ABK</small>
+            </div>
+
+            <a href="{{ url_for('data_anak') }}" class="back-link">
+                ← Kembali ke Data Anak
+            </a>
+        </div>
+    </header>
+
+    <main class="container main">
+        <p class="eyebrow">Pengelolaan Data</p>
+
+        <h1>Tambah Data Anak</h1>
+
+        <p class="description">
+            Masukkan informasi dasar anak yang diperlukan
+            untuk proses asesmen dan rekomendasi strategi pengajaran.
+        </p>
+
+        <section class="form-card">
+
+            <div class="form-heading">
+                <h2>Informasi Anak</h2>
+
+                <p>
+                    Kolom bertanda <span class="required">*</span>
+                    wajib diisi.
+                </p>
+            </div>
+
+            {% if pesan_error %}
+                <div class="error-box" role="alert">
+                    {{ pesan_error }}
+                </div>
+            {% endif %}
+
+            <form
+                action="{{ url_for('tambah_anak') }}"
+                method="POST"
+            >
+                <div class="form-group">
+                    <label for="kode_anak">
+                        Kode Anak <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="kode_anak"
+                        name="kode_anak"
+                        placeholder="Contoh: ABK001"
+                        maxlength="20"
+                        required
+                        value="{{ request.form.get('kode_anak', '') }}"
+                    >
+
+                    <small>
+                        Gunakan kode unik untuk setiap anak.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="nama_panggilan">
+                        Nama Panggilan
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nama_panggilan"
+                        name="nama_panggilan"
+                        placeholder="Masukkan nama panggilan"
+                        maxlength="50"
+                        required
+                        value="{{ request.form.get('nama_panggilan', '') }}"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="tanggal_lahir">
+                        Tanggal Lahir
+                        <span class="required">*</span>
+                    </label>
+
+                    <input
+                        type="date"
+                        id="tanggal_lahir"
+                        name="tanggal_lahir"
+                        required
+                        value="{{ request.form.get('tanggal_lahir', '') }}"
+                    >
+
+                    <small>
+                        Digunakan untuk menghitung usia kronologis
+                        saat asesmen.
+                    </small>
+                </div>
+
+                <div class="form-actions">
+                    <a
+                        href="{{ url_for('data_anak') }}"
+                        class="button-secondary"
+                    >
+                        Batal
+                    </a>
+
+                    <button type="submit" class="button-primary">
+                        Simpan Data
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <footer class="footer">
+            Sistem Pendukung Keputusan · SDN Burengan 5
+        </footer>
+    </main>
+</body>
+</html>

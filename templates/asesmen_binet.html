@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Asesmen Binet | Ruang Arah</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <div class="brand">
+                Ruang Arah
+                <small>SPK Strategi Pengajaran ABK</small>
+            </div>
+
+            <a href="/" class="back-link">
+                ← Kembali ke Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main class="container main">
+        <p class="eyebrow">Modul Asesmen</p>
+
+        <h1>Asesmen Binet</h1>
+
+        <p class="description">
+            Pilih data anak untuk memulai proses pengolahan hasil
+            asesmen dan penyusunan profil kemampuan individual.
+        </p>
+
+        {% if error_database %}
+
+            <div class="error-box" role="alert">
+                Data tidak dapat dimuat. Periksa koneksi MySQL
+                dan terminal Flask.
+            </div>
+
+        {% elif anak_terpilih %}
+
+            <section class="table-card">
+                <p class="eyebrow">Anak Terpilih</p>
+
+                <h2>{{ anak_terpilih.nama_panggilan }}</h2>
+
+                <div class="child-summary">
+                    <div>
+                        <span>Kode Anak</span>
+                        <strong>{{ anak_terpilih.kode_anak }}</strong>
+                    </div>
+
+                    <div>
+                        <span>Tanggal Lahir</span>
+                        <strong>
+                            {{ anak_terpilih.tanggal_lahir.strftime('%d-%m-%Y') }}
+                        </strong>
+                    </div>
+                </div>
+            
+                {% if asesmen_created %}
+                    <div class="success-box" role="status">
+                        <span class="success-icon">✓</span>
+                        Sesi asesmen berhasil dibuat dengan status draft.
+                    </div>
+                {% endif %}
+
+                {% if pesan_error %}
+                    <div class="error-box" role="alert">
+                        {{ pesan_error }}
+                    </div>
+                {% endif %}
+
+                <div class="form-heading" style="margin-top: 28px;">
+                    <h2>Buat Sesi Asesmen</h2>
+                    <p>
+                        Catat tanggal pemeriksaan dan versi instrumen
+                        yang digunakan.
+                    </p>
+                </div>
+
+                <form
+                    action="{{ url_for('asesmen_binet', anak_id=anak_terpilih.id) }}"
+                    method="POST"
+                >
+                    <div class="form-group">
+                        <label for="tanggal_tes">
+                            Tanggal Tes <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            id="tanggal_tes"
+                            name="tanggal_tes"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="versi_instrumen">
+                            Versi Instrumen
+                        </label>
+
+                        <input
+                            type="text"
+                            id="versi_instrumen"
+                            name="versi_instrumen"
+                            maxlength="100"
+                            placeholder="Isi setelah versi instrumen teridentifikasi"
+                        >
+
+                        <small>
+                            Opsional untuk pencatatan awal. Jangan mengarang
+                            nama atau versi instrumen.
+                        </small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="button-primary">
+                            Buat Sesi Asesmen
+                        </button>
+                    </div>
+                </form>
+
+                <div class="form-heading" style="margin-top: 34px;">
+                    <h2>Riwayat Asesmen</h2>
+                    <p>Sesi pemeriksaan yang tercatat untuk anak ini.</p>
+                </div>
+
+                {% if daftar_asesmen %}
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal Tes</th>
+                                    <th>Versi Instrumen</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for asesmen in daftar_asesmen %}
+                                    <tr>
+                                        <td>
+                                            {{ asesmen.tanggal_tes.strftime('%d-%m-%Y') }}
+                                        </td>
+
+                                        <td>
+                                            {{ asesmen.versi_instrumen or 'Belum dicatat' }}
+                                        </td>
+
+                                        <td>
+                                            {{ asesmen.status_asesmen|capitalize }}
+                                        </td>
+                                        <td>
+                                            <a
+                                                href="{{ url_for('detail_asesmen_binet', asesmen_id=asesmen.id) }}"
+                                                class="button-edit"
+                                            >
+                                                Lihat Detail
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3>Belum ada sesi asesmen</h3>
+                        <p>Sesi pertama akan muncul setelah formulir disimpan.</p>
+                    </div>
+                {% endif %}
+
+
+                <div class="status">
+                    Identitas anak berhasil dipilih.
+                    Tahap berikutnya adalah membuat formulir input
+                    hasil tes Binet berdasarkan pedoman instrumen
+                    yang digunakan.
+                </div>
+
+                <p class="description">
+                    Belum ada perhitungan atau hasil asesmen yang
+                    disimpan pada tahap ini.
+                </p>
+
+                <a
+                    href="{{ url_for('asesmen_binet') }}"
+                    class="button-secondary"
+                >
+                    Pilih Anak Lain
+                </a>
+            </section>
+
+        {% else %}
+
+            <section class="table-card">
+                <div class="table-heading">
+                    <div>
+                        <h2>Pilih Anak</h2>
+                        <p>Pilih satu anak untuk melanjutkan.</p>
+                    </div>
+
+                    <span class="count-badge">
+                        {{ daftar_anak|length }} data
+                    </span>
+                </div>
+
+                {% if daftar_anak %}
+
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Kode Anak</th>
+                                    <th>Nama Panggilan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for anak in daftar_anak %}
+                                    <tr>
+                                        <td>{{ anak.kode_anak }}</td>
+
+                                        <td>
+                                            {{ anak.nama_panggilan }}
+                                        </td>
+
+                                        <td>
+                                            <a
+                                                href="{{ url_for('asesmen_binet', anak_id=anak.id) }}"
+                                                class="button-primary"
+                                            >
+                                                Pilih Anak
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+
+                        <h3>Belum ada data anak</h3>
+
+                        <p>
+                            Tambahkan data anak terlebih dahulu
+                            melalui menu Data Anak.
+                        </p>
+
+                        <a
+                            href="{{ url_for('data_anak') }}"
+                            class="button-primary"
+                        >
+                            Buka Data Anak
+                        </a>
+                    </div>
+
+                {% endif %}
+            </section>
+
+        {% endif %}
+
+        <footer class="footer">
+            Sistem Pendukung Keputusan · SDN Burengan 5
+        </footer>
+    </main>
+</body>
+</html>

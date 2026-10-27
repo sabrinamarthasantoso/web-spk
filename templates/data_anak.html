@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Data Anak | Ruang Arah</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <div class="brand">
+                Ruang Arah
+                <small>SPK Strategi Pengajaran ABK</small>
+            </div>
+
+            <a href="/" class="back-link">
+                ← Kembali ke Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main class="container main">
+        <p class="eyebrow">Pengelolaan Data</p>
+
+        <h1>Data Anak</h1>
+
+        <p class="description">
+            Kelola profil anak yang akan menjalani proses asesmen
+            dan pengolahan rekomendasi strategi pengajaran.
+        </p>
+
+        {% if error_database %}
+
+            <div class="error-box">
+                Data belum dapat ditampilkan.
+                Periksa koneksi MySQL dan lihat pesan error
+                pada terminal VS Code.
+            </div>
+
+        {% else %}
+            
+            {% if data_added %}
+                <div class="success-box" role="status">
+                    <span class="success-icon">✓</span>
+                    Data anak berhasil ditambahkan.
+                </div>
+            {% endif %}
+
+            {% if data_updated %}
+                <div class="success-box" role="status">
+                    <span class="success-icon">✓</span>
+                    Perubahan data anak berhasil disimpan.
+                </div>
+            {% endif %}
+
+            {% if data_deleted %}
+                <div class="success-box" role="status">
+                    <span class="success-icon">✓</span>
+                    Data anak berhasil dihapus.
+                </div>
+            {% endif %}
+
+            <section class="table-card">
+                
+                <div class="table-heading">
+                    <div>
+                        <h2>Daftar Anak</h2>
+                        <p>Data yang tersimpan di database.</p>
+                    </div>
+
+                    <div class="table-actions">
+                        <span class="count-badge">
+                            {{ daftar_anak|length }} data
+                        </span>
+
+                        <a
+                            href="{{ url_for('tambah_anak') }}"
+                            class="button-primary"
+                        >
+                            + Tambah Data Anak
+                        </a>
+                    </div>
+                </div>
+
+                {% if daftar_anak %}
+
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Kode Anak</th>
+                                    <th>Nama Panggilan</th>
+                                    <th>Tanggal Lahir</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for anak in daftar_anak %}
+                                    <tr>
+                                        <td>{{ anak.kode_anak }}</td>
+                                        <td>{{ anak.nama_panggilan }}</td>
+                                        <td>
+                                            {{ anak.tanggal_lahir.strftime('%d-%m-%Y') }}
+                                        </td>                                       
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a
+                                                    href="{{ url_for('edit_anak', anak_id=anak.id) }}"
+                                                    class="button-edit"
+                                                    title="Edit data anak"
+                                                >
+                                                    Edit
+                                                </a>
+
+                                                <form
+                                                    action="{{ url_for('hapus_anak', anak_id=anak.id) }}"
+                                                    method="POST"
+                                                    class="inline-form"
+                                                    onsubmit="return confirm('Yakin ingin menghapus data anak ini? Data yang dihapus tidak dapat dikembalikan.');"
+                                                >
+                                                    <button
+                                                        type="button"
+                                                        class="button-delete"
+                                                        data-delete-url="{{ url_for('hapus_anak', anak_id=anak.id) }}"
+                                                        data-child-name="{{ anak.nama_panggilan }}"
+                                                        onclick="bukaKonfirmasiHapus(this)"
+                                                        title="Hapus data anak"
+                                                    >
+                                                        Hapus
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                {% else %}
+
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+
+                        <h3>Belum ada data anak</h3>
+
+                        <p>
+                            Database sudah bisa diperiksa,
+                            tetapi belum memiliki data untuk ditampilkan.
+                        </p>
+
+                        <p>
+                            Fitur tambah data akan kita buat
+                            pada langkah berikutnya.
+                        </p>
+                    </div>
+
+                {% endif %}
+            </section>
+
+        {% endif %}
+
+        <footer class="footer">
+            Sistem Pendukung Keputusan · SDN Burengan 5
+        </footer>
+    </main>
+    
+<!-- Modal konfirmasi hapus -->
+<div class="confirm-overlay" id="modalHapus" hidden>
+    <section
+        class="confirm-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="judulKonfirmasiHapus"
+        aria-describedby="deskripsiKonfirmasiHapus"
+    >
+        <button
+            type="button"
+            class="confirm-close"
+            onclick="tutupKonfirmasiHapus()"
+            aria-label="Tutup konfirmasi"
+        >
+            &times;
+        </button>
+
+        <div class="confirm-icon" aria-hidden="true">
+            <span>🗑️</span>
+        </div>
+
+        <p class="confirm-eyebrow">Konfirmasi tindakan</p>
+
+        <h2 id="judulKonfirmasiHapus">Hapus data anak?</h2>
+
+        <p class="confirm-description" id="deskripsiKonfirmasiHapus">
+            Apakah yakin ingin menghapus data:
+        </p>
+
+        <div class="confirm-child">
+            <span class="confirm-child-label">Data yang dipilih</span>
+            <strong id="namaAnakHapus">—</strong>
+        </div>
+
+        <div class="confirm-warning">
+            <span aria-hidden="true">!</span>
+            <p>
+                Data yang dihapus tidak dapat dipulihkan melalui halaman ini.
+                Pastikan memilih data yang benar.
+            </p>
+        </div>
+
+        <form id="formKonfirmasiHapus" method="POST">
+            <div class="confirm-actions">
+                <button
+                    type="button"
+                    id="batalHapus"
+                    class="confirm-cancel"
+                    onclick="tutupKonfirmasiHapus()"
+                >
+                    Batal
+                </button>
+
+                <button type="submit" class="confirm-delete-submit">
+                    Ya, Hapus Data
+                </button>
+            </div>
+        </form>
+    </section>
+</div>
+
+<script>
+    let tombolPemicuHapus = null;
+
+    function bukaKonfirmasiHapus(tombol) {
+        tombolPemicuHapus = tombol;
+
+        const modal = document.getElementById("modalHapus");
+        const form = document.getElementById("formKonfirmasiHapus");
+        const namaAnak = document.getElementById("namaAnakHapus");
+
+        // Menentukan data yang akan dihapus
+        form.action = tombol.dataset.deleteUrl;
+        namaAnak.textContent = tombol.dataset.childName;
+
+        // Membuka modal
+        modal.hidden = false;
+        document.body.classList.add("modal-open");
+
+        document.getElementById("batalHapus").focus();
+    }
+
+    function tutupKonfirmasiHapus() {
+        const modal = document.getElementById("modalHapus");
+
+        modal.hidden = true;
+        document.body.classList.remove("modal-open");
+
+        if (tombolPemicuHapus) {
+            tombolPemicuHapus.focus();
+        }
+    }
+
+    // Tutup jika area gelap di luar card diklik
+    document.getElementById("modalHapus").addEventListener(
+        "click",
+        function (event) {
+            if (event.target === this) {
+                tutupKonfirmasiHapus();
+            }
+        }
+    );
+
+    // Tombol Escape untuk menutup modal
+    document.addEventListener("keydown", function (event) {
+        const modal = document.getElementById("modalHapus");
+
+        if (event.key === "Escape" && !modal.hidden) {
+            tutupKonfirmasiHapus();
+        }
+    });
+</script>
+</body>
+</html>
+</body>
+</html>

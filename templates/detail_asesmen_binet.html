@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Detail Asesmen | Ruang Arah</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <div class="brand">
+                Ruang Arah
+                <small>SPK Strategi Pengajaran ABK</small>
+            </div>
+
+            <a
+                href="{{ url_for('asesmen_binet', anak_id=sesi.anak_id) }}"
+                class="back-link"
+            >
+                ← Kembali ke Riwayat Asesmen
+            </a>
+        </div>
+    </header>
+
+    <main class="container main">
+        <p class="eyebrow">Modul Asesmen</p>
+
+        <h1>Detail Sesi Asesmen</h1>
+
+        <p class="description">
+            Informasi sesi pemeriksaan yang tercatat
+            untuk anak terpilih.
+        </p>
+
+        <section class="table-card detail-card">
+            <div class="detail-heading">
+                <div>
+                    <h2>{{ sesi.nama_panggilan }}</h2>
+                    <p>Kode Anak: {{ sesi.kode_anak }}</p>
+                </div>
+
+                <span class="status-draft">
+                    {{ sesi.status_asesmen|capitalize }}
+                </span>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span>ID Sesi</span>
+                    <strong>{{ sesi.asesmen_id }}</strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Tanggal Tes</span>
+                    <strong>
+                        {{ sesi.tanggal_tes.strftime('%d-%m-%Y') }}
+                    </strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Tanggal Lahir</span>
+                    <strong>
+                        {{ sesi.tanggal_lahir.strftime('%d-%m-%Y') }}
+                    </strong>
+                </div>
+
+                <div class="detail-item">
+                    <span>Versi Instrumen</span>
+                    <strong>
+                        {{ sesi.versi_instrumen or 'Belum dikonfirmasi' }}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="status">
+                <strong>Belum ada hasil tes yang diolah.</strong>
+                <p>
+                    Sesi ini masih berupa draf. Data hasil pemeriksaan,
+                    perhitungan, dan profil kemampuan akan ditambahkan
+                    setelah pedoman instrumen dipastikan.
+                </p>
+            </div>
+
+            <div class="form-actions">
+                <a
+                    href="{{ url_for('asesmen_binet', anak_id=sesi.anak_id) }}"
+                    class="button-secondary"
+                >
+                    Kembali
+                </a>
+            </div>
+        </section>
+
+        <footer class="footer">
+            Sistem Pendukung Keputusan · SDN Burengan 5
+        </footer>
+    </main>
+</body>
+</html>

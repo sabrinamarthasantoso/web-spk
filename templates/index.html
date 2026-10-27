@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | SPK Strategi Pengajaran ABK</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header-content">
+            <div class="brand">
+                Ruang Arah
+                <small>SPK Strategi Pengajaran ABK</small>
+            </div>
+
+            <div>SDN Burengan 5</div>
+        </div>
+    </header>
+
+    <main class="container main">
+        <p class="eyebrow">Dashboard</p>
+
+        <h1>Selamat datang!</h1>
+
+        <p class="description">
+            Sistem pendukung keputusan untuk membantu mengolah hasil
+            asesmen anak sebagai dasar rekomendasi strategi pengajaran
+            sesuai kebutuhan masing-masing anak.
+        </p>
+
+        <section class="menu-grid">
+           
+            <a href="{{ url_for('data_anak') }}" class="menu-card-link">
+                <article class="menu-card">
+                    <div class="menu-icon">👧</div>
+
+                    <h2>Data Anak</h2>
+
+                    <p>
+                        Kelola profil anak dan lihat data yang telah
+                        tersimpan dalam sistem.
+                    </p>
+                </article>
+            </a>
+            
+            <a href="{{ url_for('asesmen_binet') }}" class="menu-card-link">
+                <article class="menu-card">
+                    <div class="menu-icon">📋</div>
+
+                    <h2>Asesmen Binet</h2>
+
+                    <p>
+                        Pilih anak dan mulai proses pengolahan hasil
+                        asesmen serta profil kemampuan individual.
+                    </p>
+                </article>
+            </a>
+
+            <article class="menu-card">
+                <div class="menu-icon">🧮</div>
+
+                <h2>Rekomendasi</h2>
+
+                <p>
+                    Bagian untuk mengolah input asesmen menggunakan
+                    Fuzzy Tsukamoto dan menampilkan rekomendasi.
+                </p>
+            </article>
+
+        </section>
+
+        <div class="status">
+            <strong>Status aplikasi:</strong>
+            Kerangka dashboard berhasil dibuat.
+        </div>
+
+        <footer class="footer">
+            Sistem Pendukung Keputusan · SDN Burengan 5
+        </footer>
+    </main>
+
+</body>
+</html>
