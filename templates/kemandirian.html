@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+
+{% block title %}Kemandirian &amp; Fokus | Ruang Arah{% endblock %}
+
+{% block header_title %}Kemandirian &amp; Fokus Anak{% endblock %}
+{% block header_subtitle %}Penilaian manual berbasis indikator perilaku harian &amp; Fuzzifikasi Tsukamoto{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- TOP ACTION & BACK -->
+    <div class="flex items-center justify-between">
+        <a href="{{ url_for('detail_asesmen_binet', asesmen_id=sesi.asesmen_id) }}" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-sky-700 bg-white px-3.5 py-2 rounded-xl border border-slate-200/80 shadow-sm transition-all hover:-translate-x-0.5">
+            <i class="fa-solid fa-arrow-left text-[11px]"></i>
+            <span>Kembali ke Detail Sesi Asesmen</span>
+        </a>
+
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-sky-50 rounded-full border border-sky-100 text-xs text-sky-800 shadow-sm font-medium">
+            <span>Anak:</span>
+            <strong class="text-sky-900">{{ sesi.nama_panggilan }}</strong>
+            <span class="text-sky-300">|</span>
+            <span class="text-sky-600">{{ sesi.kode_anak }}</span>
+        </div>
+    </div>
+
+    <!-- MAIN GRID 2 COLS -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- KOLOM KIRI (7/12): CHECKLIST INDIKATOR -->
+        <div class="lg:col-span-7 bg-white p-6 md:p-8 rounded-3xl border border-slate-100 soft-shadow space-y-5">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+                <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-sliders"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-bold text-slate-800 text-lg">
+                        Input Indikator Kemandirian Belajar
+                    </h3>
+                    <p class="text-xs text-slate-400">
+                        Observasi perilaku harian anak saat mengikuti pembelajaran di kelas
+                    </p>
+                </div>
+            </div>
+
+            <!-- KELOMPOK INDIKATOR KEMANDIRIAN -->
+            <div class="border border-slate-100 rounded-2xl p-4 bg-emerald-50/30 space-y-3">
+                <div class="flex items-center justify-between">
+                    <h4 class="font-display font-bold text-xs uppercase tracking-wider text-emerald-800">
+                        1. Indikator Kemandirian (Bina Diri &amp; Tugas Kelas)
+                    </h4>
+                    <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
+                        4 Checklist Perilaku
+                    </span>
+                </div>
+
+                <form id="formKemandirian" action="/asesmen-binet/sesi/{{ sesi.asesmen_id }}/kemandirian/simpan" method="POST" class="space-y-2.5 pt-1">
+                    
+                    <!-- Indikator 1: Memulai Tugas -->
+                    <label class="check-item-card flex items-start gap-3.5 p-3.5 rounded-xl border transition-all cursor-pointer {% if kemandirian.memulai_tugas %}bg-white border-emerald-400 shadow-sm{% else %}bg-white/80 border-slate-200/80 hover:bg-white{% endif %}">
+                        <input
+                            type="checkbox"
+                            name="memulai_tugas"
+                            value="1"
+                            {% if kemandirian.memulai_tugas %}checked{% endif %}
+                            class="hidden"
+                            onchange="toggleCheck(this)"
+                        >
+                        <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold transition-colors {% if kemandirian.memulai_tugas %}bg-emerald-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-300 border border-slate-200{% endif %}">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-bold text-xs text-slate-800">1. Memulai Tugas</div>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                                Anak mulai mengerjakan tugas tanpa harus diingatkan berulang kali oleh guru.
+                            </p>
+                        </div>
+                    </label>
+
+                    <!-- Indikator 2: Mengerjakan Langkah Tugas -->
+                    <label class="check-item-card flex items-start gap-3.5 p-3.5 rounded-xl border transition-all cursor-pointer {% if kemandirian.langkah_tugas %}bg-white border-emerald-400 shadow-sm{% else %}bg-white/80 border-slate-200/80 hover:bg-white{% endif %}">
+                        <input
+                            type="checkbox"
+                            name="langkah_tugas"
+                            value="1"
+                            {% if kemandirian.langkah_tugas %}checked{% endif %}
+                            class="hidden"
+                            onchange="toggleCheck(this)"
+                        >
+                        <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold transition-colors {% if kemandirian.langkah_tugas %}bg-emerald-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-300 border border-slate-200{% endif %}">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-bold text-xs text-slate-800">2. Langkah Tugas Sederhana</div>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                                Menyelesaikan tahapan aktivitas atau instruksi pembelajaran tanpa bantuan fisik terus-menerus.
+                            </p>
+                        </div>
+                    </label>
+
+                    <!-- Indikator 3: Meminta Bantuan -->
+                    <label class="check-item-card flex items-start gap-3.5 p-3.5 rounded-xl border transition-all cursor-pointer {% if kemandirian.meminta_bantuan %}bg-white border-emerald-400 shadow-sm{% else %}bg-white/80 border-slate-200/80 hover:bg-white{% endif %}">
+                        <input
+                            type="checkbox"
+                            name="meminta_bantuan"
+                            value="1"
+                            {% if kemandirian.meminta_bantuan %}checked{% endif %}
+                            class="hidden"
+                            onchange="toggleCheck(this)"
+                        >
+                        <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold transition-colors {% if kemandirian.meminta_bantuan %}bg-emerald-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-300 border border-slate-200{% endif %}">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-bold text-xs text-slate-800">3. Meminta Bantuan yang Tepat</div>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                                Mampu meminta bantuan secara verbal atau isyarat dengan tepat saat mengalami kesulitan.
+                            </p>
+                        </div>
+                    </label>
+
+                    <!-- Indikator 4: Merapikan Perlengkapan -->
+                    <label class="check-item-card flex items-start gap-3.5 p-3.5 rounded-xl border transition-all cursor-pointer {% if kemandirian.merapikan_perlengkapan %}bg-white border-emerald-400 shadow-sm{% else %}bg-white/80 border-slate-200/80 hover:bg-white{% endif %}">
+                        <input
+                            type="checkbox"
+                            name="merapikan_perlengkapan"
+                            value="1"
+                            {% if kemandirian.merapikan_perlengkapan %}checked{% endif %}
+                            class="hidden"
+                            onchange="toggleCheck(this)"
+                        >
+                        <div class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-bold transition-colors {% if kemandirian.merapikan_perlengkapan %}bg-emerald-600 text-white shadow-sm{% else %}bg-slate-100 text-slate-300 border border-slate-200{% endif %}">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="font-bold text-xs text-slate-800">4. Tanggung Jawab &amp; Merapikan</div>
+                            <p class="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                                Merapikan alat tulis, buku, atau perlengkapan belajar setelah tugas selesai.
+                            </p>
+                        </div>
+                    </label>
+                </form>
+
+                <div class="text-[11px] text-slate-400 pt-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-cloud-arrow-up text-emerald-600"></i>
+                    <span>Tersimpan otomatis saat opsi dicentang.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- KOLOM KANAN (5/12): SKOR & FUZZIFIKASI -->
+        <div class="lg:col-span-5 space-y-4">
+            
+            <!-- Card 1: Total Skor Kemandirian (Dark Indigo/Slate Card with Amber Score) -->
+            <div class="bg-gradient-to-br from-slate-800 to-indigo-900 text-white p-6 rounded-3xl shadow-xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-sky-300 uppercase tracking-wider">Tingkat Kemandirian Terhitung</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-emerald-200">
+                        Skala 0 - 4
+                    </span>
+                </div>
+
+                <div class="flex items-baseline gap-2">
+                    <span class="text-5xl font-extrabold font-display text-amber-300" id="skorAngka">
+                        {{ kemandirian.skor_total }}
+                    </span>
+                    <span class="text-sm font-semibold text-slate-300">
+                        / 4 Indikator Terpenuhi
+                    </span>
+                </div>
+
+                <p class="text-xs text-slate-300 leading-relaxed border-t border-white/10 pt-3">
+                    Skor ini menjadi parameter input kedua Fuzzy Tsukamoto yang dikombinasikan bersama rasio IQ Stanford-Binet.
+                </p>
+            </div>
+
+            <!-- Card 2: Derajat Keanggotaan Fuzzy (Pastel Card) -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 soft-shadow space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div>
+                        <h4 class="font-display font-bold text-slate-800 text-sm">
+                            Derajat Keanggotaan Fuzzy
+                        </h4>
+                        <p class="text-[11px] text-slate-400">Nilai keanggotaan &mu;(x) &isin; [0, 1]</p>
+                    </div>
+                </div>
+
+                <!-- Bar Rendah (Peach/Amber) -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <span class="text-slate-600">Rendah</span>
+                        <span class="text-amber-600 font-bold" id="labelRendah">
+                            {{ "%.3f"|format(derajat.rendah)|replace('.', ',') }}
+                        </span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                        <div
+                            class="fuzzy-bar-fill bg-amber-400 h-2.5 rounded-full transition-all duration-500"
+                            id="barRendah"
+                            data-width="{{ derajat.rendah * 100 }}"
+                        ></div>
+                    </div>
+                </div>
+
+                <!-- Bar Sedang (Sky Blue) -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <span class="text-slate-600">Sedang</span>
+                        <span class="text-sky-600 font-bold" id="labelSedang">
+                            {{ "%.3f"|format(derajat.sedang)|replace('.', ',') }}
+                        </span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                        <div
+                            class="fuzzy-bar-fill bg-sky-500 h-2.5 rounded-full transition-all duration-500"
+                            id="barSedang"
+                            data-width="{{ derajat.sedang * 100 }}"
+                        ></div>
+                    </div>
+                </div>
+
+                <!-- Bar Tinggi (Mint/Emerald) -->
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-semibold">
+                        <span class="text-slate-600">Tinggi</span>
+                        <span class="text-emerald-600 font-bold" id="labelTinggi">
+                            {{ "%.3f"|format(derajat.tinggi)|replace('.', ',') }}
+                        </span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                        <div
+                            class="fuzzy-bar-fill bg-emerald-500 h-2.5 rounded-full transition-all duration-500"
+                            id="barTinggi"
+                            data-width="{{ derajat.tinggi * 100 }}"
+                        ></div>
+                    </div>
+                </div>
+
+                <p class="text-[11px] text-slate-400 leading-relaxed pt-2 border-t border-slate-100">
+                    Fungsi keanggotaan menggunakan kurva segitiga simulasi studi kasus untuk SPK.
+                </p>
+            </div>
+
+            <!-- Card 3: Parameter Fokus & Rentang Atensi (Dashed Pastel Box) -->
+            <div class="p-5 rounded-3xl border border-dashed border-sky-300 bg-sky-50/40 text-xs space-y-1.5">
+                <div class="font-bold text-sky-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-bullseye text-sky-600"></i>
+                    <span>2. Indikator Fokus &amp; Rentang Atensi (Cadangan)</span>
+                </div>
+                <p class="text-[11px] text-slate-500 leading-relaxed">
+                    Bagian ini disiapkan untuk parameter ketiga (rentang atensi &gt;15 menit, ketahanan distraksi suara) jika disetujui dosen pembimbing.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- RADAR CHART PEMETAAN INDIKATOR -->
+        <div class="lg:col-span-12 bg-white p-6 md:p-8 rounded-3xl border border-slate-100 soft-shadow space-y-4">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                <div>
+                    <h4 class="font-display font-bold text-slate-800 text-sm md:text-base">
+                        Grafik Pemetaan Indikator Perilaku Belajar
+                    </h4>
+                    <p class="text-xs text-slate-400">
+                        Visualisasi pemenuhan 4 domain kemandirian: Memulai Tugas, Langkah Tugas, Meminta Bantuan, dan Merapikan Alat
+                    </p>
+                </div>
+                <span class="text-[10px] font-semibold text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
+                    Radar Chart
+                </span>
+            </div>
+            <div class="h-64 flex items-center justify-center">
+                <canvas
+                    id="chartRadarKemandirian"
+                    data-memulai="{{ 1 if kemandirian.memulai_tugas else 0 }}"
+                    data-langkah="{{ 1 if kemandirian.langkah_tugas else 0 }}"
+                    data-meminta="{{ 1 if kemandirian.meminta_bantuan else 0 }}"
+                    data-merapikan="{{ 1 if kemandirian.merapikan_perlengkapan else 0 }}"
+                ></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ACTION FOOTER: KEMBALI & LANJUT KE REKOMENDASI -->
+    <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
+        <a
+            href="{{ url_for('detail_asesmen_binet', asesmen_id=sesi.asesmen_id) }}"
+            class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-2xl text-xs transition-colors text-center"
+        >
+            &larr; Kembali ke Detail Sesi
+        </a>
+
+        <a
+            href="/asesmen-binet/sesi/{{ sesi.asesmen_id }}/rekomendasi"
+            class="w-full sm:w-auto px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-2xl text-xs shadow-md shadow-sky-600/20 transition-all flex items-center justify-center gap-2"
+        >
+            <span>Lihat Rekomendasi Stimulasi</span>
+            <i class="fa-solid fa-arrow-right text-[11px]"></i>
+        </a>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".fuzzy-bar-fill[data-width]").forEach(bar => {
+            bar.style.width = `${bar.dataset.width}%`;
+        });
+
+        const ctxRadar = document.getElementById('chartRadarKemandirian');
+        if (ctxRadar) {
+            const v1 = parseInt(ctxRadar.dataset.memulai, 10) || 0;
+            const v2 = parseInt(ctxRadar.dataset.langkah, 10) || 0;
+            const v3 = parseInt(ctxRadar.dataset.meminta, 10) || 0;
+            const v4 = parseInt(ctxRadar.dataset.merapikan, 10) || 0;
+
+            new Chart(ctxRadar.getContext('2d'), {
+                type: 'radar',
+                data: {
+                    labels: ['Memulai Tugas', 'Langkah Tugas', 'Meminta Bantuan', 'Merapikan Perlengkapan'],
+                    datasets: [{
+                        label: 'Indikator Teramati',
+                        data: [v1, v2, v3, v4],
+                        backgroundColor: 'rgba(186, 230, 253, 0.45)',
+                        borderColor: '#0284C7',
+                        pointBackgroundColor: '#0284C7',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#0284C7'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 1,
+                            ticks: {
+                                stepSize: 1,
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+    function toggleCheck(input) {
+        const form = document.getElementById('formKemandirian');
+        const formData = new FormData(form);
+
+        form.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            if (!checkbox.checked) formData.append(checkbox.name, '0');
+        });
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error(`Server status ${response.status}`);
+            }
+            window.location.reload();
+        }).catch(err => {
+            console.error(err);
+            alert('Gagal menyimpan perubahan. Silakan muat ulang halaman.');
+        });
+    }
+</script>
+{% endblock %}

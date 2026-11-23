@@ -1,90 +1,312 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-    <title>Dashboard | SPK Strategi Pengajaran ABK</title>
+{% block title %}Ruang Arah - Dashboard Asesmen Binet &amp; Kemandirian Anak{% endblock %}
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
-</head>
-<body>
+{% block header_title %}Ruang Arah Child Assessment System{% endblock %}
+{% block header_subtitle %}Pantau data siswa, rasio IQ Stanford-Binet, dan pemetaan kemandirian belajar anak{% endblock %}
 
-    <header class="header">
-        <div class="container header-content">
-            <div class="brand">
-                Ruang Arah
-                <small>SPK Strategi Pengajaran ABK</small>
+{% block content %}
+<div class="space-y-6">
+
+    <!-- BANNER WELCOME (PASTEL GRADIENT) -->
+    <div class="bg-gradient-to-r from-sky-100 via-indigo-50 to-purple-100 rounded-3xl p-6 md:p-8 border border-sky-200/60 soft-shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <span class="inline-block px-3 py-1 bg-white/80 rounded-full text-xs font-semibold text-sky-800 border border-sky-200 mb-2">
+                Dashboard Integrasi Asesmen &middot; SDN Burengan 5
+            </span>
+            <h2 class="font-display text-2xl md:text-3xl font-bold text-slate-800">
+                Ruang Arah Child Assessment System
+            </h2>
+            <p class="text-xs text-slate-600 max-w-xl mt-1 leading-relaxed">
+                Pantau grafik perkembangan rasio IQ Stanford-Binet, pemetaan indikator kemandirian belajar, dan peroleh rekomendasi stimulasi serta strategi pengajaran berbasis logika <strong class="text-sky-800 font-semibold">Fuzzy Tsukamoto</strong>.
+            </p>
+        </div>
+        <div class="flex gap-2 w-full md:w-auto">
+            <a href="{{ url_for('asesmen_binet') }}" class="bg-white hover:bg-sky-50 text-sky-700 border border-sky-200 px-4 py-2.5 rounded-xl font-semibold text-xs shadow-sm transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plus text-sky-500"></i>
+                <span>Tes Binet Baru</span>
+            </a>
+            <a href="{{ url_for('data_anak') }}" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2.5 rounded-xl font-semibold text-xs shadow-md shadow-sky-600/20 transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-users text-xs"></i>
+                <span>Data Anak</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- METRIC CARDS (PASTEL CARDS) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1: Total Terdaftar -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 soft-shadow flex items-center justify-between">
+            <div>
+                <span class="text-xs font-medium text-slate-400">Total Terdaftar</span>
+                <div class="text-2xl font-bold font-display text-slate-800 mt-1">
+                    {{ total_anak }} Anak
+                </div>
+                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-1 inline-block">
+                    Aktif Dievaluasi
+                </span>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-children"></i>
+            </div>
+        </div>
+
+        <!-- Card 2: Sesi Selesai -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 soft-shadow flex items-center justify-between">
+            <div>
+                <span class="text-xs font-medium text-slate-400">Sesi Asesmen</span>
+                <div class="text-2xl font-bold font-display text-slate-800 mt-1">
+                    {{ total_sesi }} Sesi
+                </div>
+                <span class="text-[10px] font-semibold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full mt-1 inline-block">
+                    Tes Stanford-Binet
+                </span>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+        </div>
+
+        <!-- Card 3: Metode Inferensi -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 soft-shadow flex items-center justify-between">
+            <div>
+                <span class="text-xs font-medium text-slate-400">Metode Inferensi</span>
+                <div class="text-xl font-bold font-display text-slate-800 mt-1">
+                    Tsukamoto
+                </div>
+                <span class="text-[10px] font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full mt-1 inline-block">
+                    Fuzzy Logic System
+                </span>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-award"></i>
+            </div>
+        </div>
+
+        <!-- Card 4: Kemandirian / Lokasi -->
+        <div class="bg-white p-5 rounded-3xl border border-slate-100 soft-shadow flex items-center justify-between">
+            <div>
+                <span class="text-xs font-medium text-slate-400">Kelas Inklusi</span>
+                <div class="text-xl font-bold font-display text-slate-800 mt-1">
+                    SDN Burengan 5
+                </div>
+                <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-1 inline-block">
+                    Kota Kediri
+                </span>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl">
+                <i class="fa-solid fa-star"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARTS ROW (PASTEL CHARTS) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white p-6 rounded-3xl border border-slate-100 soft-shadow">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h3 class="font-display font-bold text-slate-800 text-base">Perkembangan Skor Kemandirian &amp; IQ Siswa</h3>
+                    <p class="text-xs text-slate-400">Grafik tren evaluasi indikator kemandirian bulanan di kelas inklusi</p>
+                </div>
+                <span class="text-[10px] font-semibold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-full border border-sky-100">
+                    Tren Evaluasi
+                </span>
+            </div>
+            <div class="h-64">
+                <canvas id="chartTrendKemandirian"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 soft-shadow">
+            <div class="mb-4">
+                <h3 class="font-display font-bold text-slate-800 text-base">Sebaran Klasifikasi IQ</h3>
+                <p class="text-xs text-slate-400">Berdasarkan Rasio Binet (MA/CA)</p>
+            </div>
+            <div class="h-64 flex items-center justify-center">
+                <canvas id="chartDistribusiIQ"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN MODULES GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Card 1: Data Anak -->
+        <a href="{{ url_for('data_anak') }}" class="group bg-white p-6 rounded-3xl border border-slate-100 soft-shadow hover:shadow-lg hover:border-sky-200 transition-all flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-100">
+                        Basis Data Siswa
+                    </span>
+                    <div class="w-10 h-10 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center group-hover:bg-sky-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-child text-lg"></i>
+                    </div>
+                </div>
+                <h3 class="font-display font-bold text-slate-800 text-lg group-hover:text-sky-700 transition-colors">
+                    Data Anak
+                </h3>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                    Kelola data identitas, kode anak, dan tanggal lahir anak inklusi. Pantau riwayat dan jumlah sesi asesmen tiap siswa.
+                </p>
+            </div>
+            <div class="pt-6 flex items-center gap-2 text-xs font-semibold text-sky-600 group-hover:translate-x-1 transition-transform">
+                <span>Buka Data Siswa</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </div>
+        </a>
+
+        <!-- Card 2: Asesmen Binet -->
+        <a href="{{ url_for('asesmen_binet') }}" class="group bg-white p-6 rounded-3xl border border-slate-100 soft-shadow hover:shadow-lg hover:border-indigo-200 transition-all flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-100">
+                        Formulir Asesmen
+                    </span>
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <i class="fa-solid fa-brain text-lg"></i>
+                    </div>
+                </div>
+                <h3 class="font-display font-bold text-slate-800 text-lg group-hover:text-indigo-700 transition-colors">
+                    Asesmen Binet
+                </h3>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                    Penghitungan Rasio IQ Stanford-Binet: Rasio IQ = (Usia Mental / Usia Kronologis) &times; 100 berdasarkan akumulasi kredit item lulus.
+                </p>
+            </div>
+            <div class="pt-6 flex items-center gap-2 text-xs font-semibold text-indigo-600 group-hover:translate-x-1 transition-transform">
+                <span>Input Sesi Asesmen</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            </div>
+        </a>
+
+        <!-- Card 3: Kemandirian & Rekomendasi -->
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 soft-shadow flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-purple-700 bg-purple-50 px-3 py-1 rounded-full border border-purple-100">
+                        Indikator &amp; Hasil
+                    </span>
+                    <div class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                        <i class="fa-solid fa-lightbulb text-lg"></i>
+                    </div>
+                </div>
+                <h3 class="font-display font-bold text-slate-800 text-lg">
+                    Kemandirian &amp; Rekomendasi
+                </h3>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                    Observasi perilaku kemandirian di kelas dipadukan dengan skor IQ untuk menghasilkan rekomendasi strategi stimulasi dan intervensi yang tepat.
+                </p>
+            </div>
+            <div class="pt-6">
+                <span class="text-[11px] text-slate-400 font-medium flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-sky-500"></i>
+                    Diakses melalui detail sesi pemeriksaan anak
+                </span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ALUR PROSES SPK (PASTEL FLOW GRID) -->
+    <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 soft-shadow space-y-4">
+        <div>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Kerangka Kerja Sistem</span>
+            <h3 class="font-display font-bold text-slate-800 text-base md:text-lg">
+                Alur Pengolahan Asesmen &amp; Rekomendasi SPK
+            </h3>
+            <p class="text-xs text-slate-500">
+                Langkah-langkah evaluasi siswa ABK dari input data awal hingga strategi intervensi guru.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
+            <div class="p-4 rounded-2xl bg-sky-50/70 border border-sky-100 space-y-1">
+                <div class="text-[10px] font-bold text-sky-700 uppercase tracking-wider">Langkah 1</div>
+                <div class="text-xs font-bold text-slate-800">Data Anak</div>
+                <p class="text-[11px] text-slate-500 leading-relaxed">Profil identitas &amp; tanggal lahir</p>
             </div>
 
-            <div>SDN Burengan 5</div>
+            <div class="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-100 space-y-1">
+                <div class="text-[10px] font-bold text-indigo-700 uppercase tracking-wider">Langkah 2</div>
+                <div class="text-xs font-bold text-slate-800">Skor Binet &amp; IQ</div>
+                <p class="text-[11px] text-slate-500 leading-relaxed">Kredit tingkat, CA, MA &amp; IQ</p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 space-y-1">
+                <div class="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">Langkah 3</div>
+                <div class="text-xs font-bold text-slate-800">Kemandirian Belajar</div>
+                <p class="text-[11px] text-slate-500 leading-relaxed">Observasi indikator perilaku harian</p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-purple-50/70 border border-purple-100 space-y-1">
+                <div class="text-[10px] font-bold text-purple-700 uppercase tracking-wider">Langkah 4</div>
+                <div class="text-xs font-bold text-slate-800">Fuzzy Tsukamoto</div>
+                <p class="text-[11px] text-slate-500 leading-relaxed">Fuzzifikasi, aturan inferensi &amp; defuzzifikasi</p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-sky-100 to-indigo-100 border border-sky-200/80 space-y-1 shadow-sm">
+                <div class="text-[10px] font-bold text-sky-800 uppercase tracking-wider">Langkah 5</div>
+                <div class="text-xs font-bold text-slate-900">Rekomendasi</div>
+                <p class="text-[11px] text-slate-700 leading-relaxed">Panduan strategi pengajaran bagi guru</p>
+            </div>
         </div>
-    </header>
+    </div>
 
-    <main class="container main">
-        <p class="eyebrow">Dashboard</p>
+    <!-- FOOTER NOTE -->
+    <div class="text-center py-4 text-xs text-slate-400">
+        Ruang Arah &middot; Child Assessment System &middot; SDN Burengan 5 Kota Kediri
+    </div>
 
-        <h1>Selamat datang!</h1>
+</div>
+{% endblock %}
 
-        <p class="description">
-            Sistem pendukung keputusan untuk membantu mengolah hasil
-            asesmen anak sebagai dasar rekomendasi strategi pengajaran
-            sesuai kebutuhan masing-masing anak.
-        </p>
+{% block extra_scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ctxTrend = document.getElementById('chartTrendKemandirian');
+        if (ctxTrend) {
+            new Chart(ctxTrend.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt'],
+                    datasets: [
+                        {
+                            label: 'Skor Kemandirian (%)',
+                            data: [65, 68, 70, 72, 75, 76, 78, 80, 82, 86],
+                            borderColor: '#0284C7',
+                            backgroundColor: 'rgba(224, 242, 254, 0.5)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { min: 40, max: 100 } }
+                }
+            });
+        }
 
-        <section class="menu-grid">
-           
-            <a href="{{ url_for('data_anak') }}" class="menu-card-link">
-                <article class="menu-card">
-                    <div class="menu-icon">👧</div>
-
-                    <h2>Data Anak</h2>
-
-                    <p>
-                        Kelola profil anak dan lihat data yang telah
-                        tersimpan dalam sistem.
-                    </p>
-                </article>
-            </a>
-            
-            <a href="{{ url_for('asesmen_binet') }}" class="menu-card-link">
-                <article class="menu-card">
-                    <div class="menu-icon">📋</div>
-
-                    <h2>Asesmen Binet</h2>
-
-                    <p>
-                        Pilih anak dan mulai proses pengolahan hasil
-                        asesmen serta profil kemampuan individual.
-                    </p>
-                </article>
-            </a>
-
-            <article class="menu-card">
-                <div class="menu-icon">🧮</div>
-
-                <h2>Rekomendasi</h2>
-
-                <p>
-                    Bagian untuk mengolah input asesmen menggunakan
-                    Fuzzy Tsukamoto dan menampilkan rekomendasi.
-                </p>
-            </article>
-
-        </section>
-
-        <div class="status">
-            <strong>Status aplikasi:</strong>
-            Kerangka dashboard berhasil dibuat.
-        </div>
-
-        <footer class="footer">
-            Sistem Pendukung Keputusan · SDN Burengan 5
-        </footer>
-    </main>
-
-</body>
-</html>
+        const ctxIQ = document.getElementById('chartDistribusiIQ');
+        if (ctxIQ) {
+            new Chart(ctxIQ.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Superior', 'High Average', 'Rata-rata', 'Borderline'],
+                    datasets: [{
+                        data: [15, 35, 40, 10],
+                        backgroundColor: ['#DDD6FE', '#BAE6FD', '#D1FAE5', '#FFEDD5']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

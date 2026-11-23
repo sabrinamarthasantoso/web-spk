@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Ruang Arah - Dashboard Asesmen Binet &amp; Kemandirian Anak{% endblock %}</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Plus Jakarta Sans & Outfit for modern pastel UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pastel: {
+                            sky: '#E0F2FE',       // Sky blue pastel
+                            skyDark: '#0284C7',
+                            blue: '#BAE6FD',
+                            mint: '#D1FAE5',      // Mint pastel
+                            mintDark: '#059669',
+                            lavender: '#EDE9FE',  // Lavender pastel
+                            lavenderDark: '#7C3AED',
+                            peach: '#FFEDD5',     // Soft peach
+                            peachDark: '#EA580C',
+                            cream: '#FEF9C3',     // Warm cream
+                            sand: '#F8FAFC',      // Soft background
+                            card: '#FFFFFF',
+                            text: '#334155',      // Soft slate text
+                            muted: '#64748B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f1f5f9;
+            color: #334155;
+        }
+        .soft-shadow {
+            box-shadow: 0 10px 30px -10px rgba(148, 163, 184, 0.15);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .pastel-glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="flex h-screen overflow-hidden antialiased">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-100 transition-transform duration-300 transform md:translate-x-0 -translate-x-full flex flex-col justify-between soft-shadow">
+        <div>
+            <!-- Brand Logo -->
+            <div class="h-20 flex items-center px-6 border-b border-slate-100 gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-300 to-indigo-300 flex items-center justify-center text-slate-700 shadow-sm">
+                    <i class="fa-solid fa-compass text-xl text-sky-700"></i>
+                </div>
+                <div>
+                    <h1 class="font-display font-bold text-slate-800 text-lg leading-tight">Ruang Arah</h1>
+                    <p class="text-[11px] text-slate-400 font-medium">Prototipe Asesmen Anak</p>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1 font-medium text-sm">
+                {% set active_sesi_id = sesi.asesmen_id if (sesi is defined and sesi and sesi.asesmen_id) else 1 %}
+
+                <div class="px-3 pb-2 text-[10px] font-bold text-slate-400 tracking-wider uppercase">MODUL ASESMEN</div>
+                
+                <a href="{{ url_for('beranda') }}" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-2xl {% if active_page == 'dashboard' %}text-sky-700 bg-sky-50 font-semibold{% else %}text-slate-600 hover:bg-slate-50 hover:text-slate-900{% endif %} transition-all">
+                    <i class="fa-solid fa-chart-pie w-5 text-center text-base"></i>
+                    <span>Dashboard</span>
+                </a>
+                
+                <a href="{{ url_for('data_anak') }}" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-2xl {% if active_page == 'data_anak' %}text-sky-700 bg-sky-50 font-semibold{% else %}text-slate-600 hover:bg-slate-50 hover:text-slate-900{% endif %} transition-all">
+                    <i class="fa-solid fa-child w-5 text-center text-base"></i>
+                    <span>Data Anak</span>
+                </a>
+                
+                <a href="{{ url_for('asesmen_binet') }}" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-2xl {% if active_page == 'asesmen' %}text-sky-700 bg-sky-50 font-semibold{% else %}text-slate-600 hover:bg-slate-50 hover:text-slate-900{% endif %} transition-all">
+                    <i class="fa-solid fa-brain w-5 text-center text-base"></i>
+                    <span>Asesmen Binet</span>
+                </a>
+
+                <a href="{{ url_for('sesi_terbaru') }}" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-2xl {% if active_page == 'detail_sesi' %}text-sky-700 bg-sky-50 font-semibold{% else %}text-slate-600 hover:bg-slate-50 hover:text-slate-900{% endif %} transition-all">
+                    <i class="fa-solid fa-clipboard-list w-5 text-center text-base"></i>
+                    <span>Detail Sesi Tes</span>
+                </a>
+
+                <div class="px-3 pt-4 pb-2 text-[10px] font-bold text-slate-400 tracking-wider uppercase">INDIKATOR &amp; HASIL</div>
+
+                <a href="/asesmen-binet/sesi/{{ active_sesi_id }}/kemandirian" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-2xl {% if active_page == 'kemandirian' %}text-sky-700 bg-sky-50 font-semibold{% else %}text-slate-600 hover:bg-slate-50 hover:text-slate-900{% endif %} transition-all">
+                    <i class="fa-solid fa-hands-holding-child w-5 text-center text-base"></i>
+                    <span>Kemandirian &amp; Fokus</span>
+                </a>
+
+                <a href="/asesmen-binet/sesi/{{ active_sesi_id }}/rekomendasi" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-2xl {% if active_page == 'rekomendasi' %}text-sky-700 bg-sky-50 font-semibold{% else %}text-slate-600 hover:bg-slate-50 hover:text-slate-900{% endif %} transition-all">
+                    <i class="fa-solid fa-lightbulb w-5 text-center text-base"></i>
+                    <span>Rekomendasi</span>
+                </a>
+            </nav>
+        </div>
+
+        <!-- Sidebar Info Card -->
+        <div class="p-4 border-t border-slate-100">
+            <div class="bg-gradient-to-br from-sky-50 to-indigo-50 p-4 rounded-2xl border border-sky-100/60 text-slate-700">
+                <div class="flex items-center gap-2 text-xs font-semibold text-sky-800 mb-1">
+                    <i class="fa-solid fa-shield-heart text-sky-500"></i> Tes Stanford-Binet
+                </div>
+                <p class="text-[11px] text-slate-500 leading-relaxed mb-3">Formulir evaluasi rasio IQ (MA/CA) &amp; observasi perilaku anak.</p>
+                <a href="{{ url_for('asesmen_binet') }}" class="block text-center w-full bg-white text-sky-700 hover:bg-sky-100 text-xs font-semibold py-2 px-3 rounded-xl border border-sky-200 transition-colors shadow-sm">
+                    + Input Sesi Binet
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT WRAPPER -->
+    <div class="flex-1 flex flex-col md:ml-64 min-w-0 h-screen overflow-hidden">
+        
+        <!-- HEADER TOPBAR -->
+        <header class="h-20 border-b border-slate-100 pastel-glass sticky top-0 z-30 px-6 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <button id="sidebar-toggle" class="md:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <div>
+                    <h2 class="font-display font-bold text-slate-800 text-base md:text-lg leading-tight">
+                        {% block header_title %}Ruang Arah Child Assessment System{% endblock %}
+                    </h2>
+                    <p class="text-[11px] text-slate-400">
+                        {% block header_subtitle %}Dashboard Integrasi Asesmen Binet &amp; Kemandirian Anak{% endblock %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Status & User Profile -->
+            <div class="flex items-center gap-3 sm:gap-4">
+                <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-sky-50 border border-sky-100 rounded-full text-xs text-sky-700 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Mode Prototipe Active
+                </div>
+                
+                <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+
+                <div class="flex items-center gap-3 cursor-pointer">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 font-bold text-sm shadow-sm">
+                        RA
+                    </div>
+                    <div class="hidden md:block text-left">
+                        <div class="text-xs font-bold text-slate-800 leading-tight">Guru Evaluator</div>
+                        <div class="text-[10px] text-slate-400 font-medium">SDN Burengan 5</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN SCROLLABLE CONTENT BODY -->
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 custom-scrollbar">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- SCRIPT FOR SIDEBAR TOGGLE ON MOBILE -->
+    <script>
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+
+        if (sidebarToggle && sidebar) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+        }
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

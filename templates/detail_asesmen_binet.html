@@ -1,106 +1,297 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-    <title>Detail Asesmen | Ruang Arah</title>
+{% block title %}Detail Sesi Asesmen | Ruang Arah{% endblock %}
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
-</head>
+{% block header_title %}Detail Sesi &amp; Checklist Binet{% endblock %}
+{% block header_subtitle %}Kalkulasi Usia Mental (MA), Usia Kronologis (CA), dan Rasio IQ Stanford-Binet{% endblock %}
 
-<body>
-    <header class="header">
-        <div class="container header-content">
-            <div class="brand">
-                Ruang Arah
-                <small>SPK Strategi Pengajaran ABK</small>
+{% block content %}
+<div class="space-y-6">
+
+    <!-- BACK LINK & TOP ACTION -->
+    <div class="flex items-center justify-between">
+        <a href="{{ url_for('asesmen_binet', anak_id=sesi.anak_id) }}" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-sky-700 bg-white px-3.5 py-2 rounded-xl border border-slate-200/80 shadow-sm transition-all hover:-translate-x-0.5">
+            <i class="fa-solid fa-arrow-left text-[11px]"></i>
+            <span>Kembali ke Riwayat Asesmen</span>
+        </a>
+
+        <div class="flex items-center gap-2">
+            <span class="px-3 py-1 bg-sky-50 text-sky-700 rounded-full text-xs font-semibold border border-sky-100">
+                Sesi Aktif: {{ sesi.kode_anak }}
+            </span>
+        </div>
+    </div>
+
+    <!-- MAIN DETAIL CARD -->
+    <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 soft-shadow space-y-6">
+        
+        <!-- HEADER ROW: Siswa info -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-100 border border-indigo-200 text-indigo-700 flex items-center justify-center font-bold text-lg shadow-sm">
+                    {% set words = sesi.nama_panggilan.split() %}
+                    {% if words|length > 1 %}
+                        {{ (words[0][0] ~ words[1][0])|upper }}
+                    {% else %}
+                        {{ sesi.nama_panggilan[:2]|upper }}
+                    {% endif %}
+                </div>
+                <div>
+                    <h2 class="font-display font-bold text-slate-800 text-xl sm:text-2xl">
+                        {{ sesi.nama_panggilan }}
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">
+                        Kode Anak: <span class="font-semibold text-slate-600">{{ sesi.kode_anak }}</span> &middot; Sesi Pemeriksaan #{{ sesi.asesmen_id }}
+                    </p>
+                </div>
             </div>
 
+            <div class="text-right">
+                <span class="text-[11px] text-slate-400 block">Instrumen Evaluasi:</span>
+                <span class="text-xs font-bold text-slate-700">{{ sesi.jenis_instrumen }}</span>
+            </div>
+        </div>
+
+        <!-- 4-COL METADATA GRID -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100/80">
+                <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Tanggal Lahir</span>
+                <strong class="text-xs font-bold text-slate-700 mt-0.5 block">{{ sesi.tanggal_lahir.strftime('%d-%m-%Y') }}</strong>
+            </div>
+
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100/80">
+                <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Tanggal Tes</span>
+                <strong class="text-xs font-bold text-slate-700 mt-0.5 block">{{ sesi.tanggal_tes.strftime('%d-%m-%Y') }}</strong>
+            </div>
+
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100/80">
+                <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Instrumen</span>
+                <strong class="text-xs font-bold text-slate-700 mt-0.5 block">{{ sesi.jenis_instrumen }}</strong>
+            </div>
+
+            <div class="p-3.5 bg-slate-50 rounded-2xl border border-slate-100/80">
+                <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Usia Basal</span>
+                <strong class="text-xs font-bold text-sky-700 mt-0.5 block">Tingkat {{ sesi.usia_basal or 'VIII' }}</strong>
+            </div>
+        </div>
+
+        <!-- RESULT PANEL / METRIC CARDS ROW (FROM PROTOTYPE HTML) -->
+        <div class="bg-gradient-to-br from-slate-800 to-indigo-900 text-white p-6 rounded-3xl shadow-xl">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <span class="text-[10px] uppercase tracking-widest text-sky-300 font-semibold">Hasil Evaluasi Stanford-Binet</span>
+                    <h3 class="text-xl font-bold font-display text-white mt-0.5">{{ sesi.nama_panggilan }}</h3>
+                    <p class="text-xs text-slate-300 mt-1">
+                        Usia Kronologis (CA): 
+                        <span class="font-semibold text-sky-200">
+                            {% if ca_bulan is not none %}{{ ca_bulan }} Bulan ({{ ca_bulan // 12 }} Thn {{ ca_bulan % 12 }} Bln){% else %}—{% endif %}
+                        </span> 
+                        &nbsp;|&nbsp; 
+                        Usia Mental (MA): 
+                        <span class="font-semibold text-emerald-200">
+                            {% if hasil_ma_iq %}{{ hasil_ma_iq.ma_bulan }} Bulan ({{ hasil_ma_iq.ma_bulan // 12 }} Thn {{ hasil_ma_iq.ma_bulan % 12 }} Bln){% else %}—{% endif %}
+                        </span>
+                    </p>
+                </div>
+                <div class="flex items-center gap-4 bg-white/10 px-6 py-3.5 rounded-2xl border border-white/10 backdrop-blur-md">
+                    <div class="text-center">
+                        <div class="text-[10px] text-slate-300 uppercase">Skor IQ Binet</div>
+                        <div class="text-3xl font-extrabold text-amber-300 font-display">
+                            {% if hasil_ma_iq %}
+                                {{ "%.1f"|format(hasil_ma_iq.iq)|replace('.', ',') }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="h-8 w-px bg-white/20"></div>
+                    <div>
+                        <div class="text-[10px] text-slate-300 uppercase">Klasifikasi</div>
+                        <div class="text-xs font-bold text-emerald-300">
+                            {% if hasil_ma_iq %}
+                                {% set score = hasil_ma_iq.iq %}
+                                {% if score >= 140 %}Sangat Superior
+                                {% elif score >= 120 %}Superior
+                                {% elif score >= 110 %}High Average
+                                {% elif score >= 90 %}Normal / Rata-rata
+                                {% elif score >= 80 %}Low Average
+                                {% elif score >= 70 %}Borderline
+                                {% else %}Perlu Intervensi Khusus
+                                {% endif %}
+                            {% else %}
+                                Belum Dihitung
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABEL SKOR MENTAH PER TINGKAT USIA -->
+        <div class="border border-slate-100 rounded-3xl p-5 md:p-6 bg-slate-50/50 space-y-4">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                    <h3 class="font-display font-bold text-slate-800 text-base">
+                        Verifikasi Item Kelulusan Subtes Binet (Tingkat II s/d XIV)
+                    </h3>
+                    <p class="text-xs text-slate-400">
+                        Klik tombol minus (-) atau plus (+) untuk menyesuaikan item kelulusan.
+                    </p>
+                </div>
+
+                {% if not daftar_skor %}
+                    <form action="/asesmen-binet/sesi/{{ sesi.asesmen_id }}/simulasi" method="POST">
+                        <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-2xl text-xs font-semibold shadow-sm transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+                            <span>Muat Data Simulasi (IX - AA)</span>
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+
+            {% if daftar_skor %}
+                <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="bg-slate-50 text-slate-400 uppercase font-semibold border-b border-slate-100">
+                            <tr>
+                                <th class="px-6 py-3.5">Tingkat Usia</th>
+                                <th class="px-6 py-3.5 text-center">Item Lulus</th>
+                                <th class="px-6 py-3.5 text-center">Kredit (Bulan/Item)</th>
+                                <th class="px-6 py-3.5 text-right">Total Kredit</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 font-medium">
+                            {% for skor in daftar_skor %}
+                                <tr class="hover:bg-slate-50/60 transition-colors">
+                                    <td class="px-6 py-3.5">
+                                        <span class="font-bold text-slate-800 text-xs px-2.5 py-1 bg-slate-100 rounded-xl">
+                                            Tingkat {{ skor.tingkat_usia }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-3.5">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <button
+                                                type="button"
+                                                class="stepper-btn w-7 h-7 rounded-lg bg-slate-100 hover:bg-sky-100 hover:text-sky-700 font-bold text-sm flex items-center justify-center transition-colors"
+                                                data-asesmen="{{ sesi.asesmen_id }}"
+                                                data-tingkat="{{ skor.tingkat_usia }}"
+                                                data-lulus="{{ skor.item_lulus }}"
+                                                data-bulan="{{ skor.bulan_per_item }}"
+                                                data-delta="-1"
+                                                title="Kurangi 1 item"
+                                            >&minus;</button>
+
+                                            <span class="w-8 text-center font-bold text-slate-800 text-sm">
+                                                {{ skor.item_lulus }}
+                                            </span>
+
+                                            <button
+                                                type="button"
+                                                class="stepper-btn w-7 h-7 rounded-lg bg-slate-100 hover:bg-sky-100 hover:text-sky-700 font-bold text-sm flex items-center justify-center transition-colors"
+                                                data-asesmen="{{ sesi.asesmen_id }}"
+                                                data-tingkat="{{ skor.tingkat_usia }}"
+                                                data-lulus="{{ skor.item_lulus }}"
+                                                data-bulan="{{ skor.bulan_per_item }}"
+                                                data-delta="1"
+                                                title="Tambah 1 item"
+                                            >&plus;</button>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-3.5 text-center text-slate-500">
+                                        {{ skor.bulan_per_item }} bln/item
+                                    </td>
+                                    <td class="px-6 py-3.5 text-right font-bold text-sky-700">
+                                        {{ skor.item_lulus * skor.bulan_per_item }} bln
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="bg-sky-50/70 font-bold text-xs text-sky-900 border-t border-sky-100">
+                            <tr>
+                                <td colspan="3" class="px-6 py-3.5">Total Tambahan Kredit Mental Age:</td>
+                                <td class="px-6 py-3.5 text-right text-sm text-sky-800">
+                                    {{ total_kredit }} Bulan
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            {% else %}
+                <div class="bg-white rounded-2xl p-8 text-center space-y-3 border border-slate-100">
+                    <div class="text-3xl text-slate-300">
+                        <i class="fa-solid fa-chart-simple"></i>
+                    </div>
+                    <h4 class="font-bold text-slate-700 text-sm">Belum Ada Skor Tingkat Usia</h4>
+                    <p class="text-xs text-slate-400 max-w-md mx-auto">
+                        Tabel skor tingkat usia masih kosong. Klik tombol di bawah ini untuk mengisi tabel simulasi tingkat IX sampai AA sesuai studi kasus.
+                    </p>
+                    <div class="pt-2">
+                        <form action="/asesmen-binet/sesi/{{ sesi.asesmen_id }}/simulasi" method="POST">
+                            <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white px-5 py-2.5 rounded-2xl text-xs font-semibold shadow-md shadow-sky-600/20 transition-all inline-flex items-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+                                <span>Muat Data Simulasi Binet</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="text-[11px] text-slate-400 pt-1">
+                Kredit bulan per item diisi sesuai norma instrumen Stanford-Binet (contoh simulasi: 2 bulan/item).
+            </div>
+        </div>
+
+        <!-- ACTION FOOTER: KEMBALI & LANJUT KE KEMANDIRIAN -->
+        <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
             <a
                 href="{{ url_for('asesmen_binet', anak_id=sesi.anak_id) }}"
-                class="back-link"
+                class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-2xl text-xs transition-colors text-center"
             >
-                ← Kembali ke Riwayat Asesmen
+                Kembali
+            </a>
+
+            <a
+                href="/asesmen-binet/sesi/{{ sesi.asesmen_id }}/kemandirian"
+                class="w-full sm:w-auto px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-2xl text-xs shadow-md shadow-sky-600/20 transition-all flex items-center justify-center gap-2"
+            >
+                <span>Lanjut ke Kemandirian &amp; Fokus</span>
+                <i class="fa-solid fa-arrow-right text-[11px]"></i>
             </a>
         </div>
-    </header>
 
-    <main class="container main">
-        <p class="eyebrow">Modul Asesmen</p>
+    </div>
 
-        <h1>Detail Sesi Asesmen</h1>
+</div>
+{% endblock %}
 
-        <p class="description">
-            Informasi sesi pemeriksaan yang tercatat
-            untuk anak terpilih.
-        </p>
+{% block extra_scripts %}
+<script>
+    document.querySelectorAll('.stepper-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const asesmenId = this.getAttribute('data-asesmen');
+            const tingkatUsia = this.getAttribute('data-tingkat');
+            const currentVal = parseInt(this.getAttribute('data-lulus'), 10) || 0;
+            const bulanPerItem = this.getAttribute('data-bulan');
+            const delta = parseInt(this.getAttribute('data-delta'), 10) || 0;
+            const newVal = Math.max(0, currentVal + delta);
 
-        <section class="table-card detail-card">
-            <div class="detail-heading">
-                <div>
-                    <h2>{{ sesi.nama_panggilan }}</h2>
-                    <p>Kode Anak: {{ sesi.kode_anak }}</p>
-                </div>
+            const formData = new FormData();
+            formData.append('tingkat_usia', tingkatUsia);
+            formData.append('item_lulus', newVal);
+            formData.append('bulan_per_item', bulanPerItem);
 
-                <span class="status-draft">
-                    {{ sesi.status_asesmen|capitalize }}
-                </span>
-            </div>
-
-            <div class="detail-grid">
-                <div class="detail-item">
-                    <span>ID Sesi</span>
-                    <strong>{{ sesi.asesmen_id }}</strong>
-                </div>
-
-                <div class="detail-item">
-                    <span>Tanggal Tes</span>
-                    <strong>
-                        {{ sesi.tanggal_tes.strftime('%d-%m-%Y') }}
-                    </strong>
-                </div>
-
-                <div class="detail-item">
-                    <span>Tanggal Lahir</span>
-                    <strong>
-                        {{ sesi.tanggal_lahir.strftime('%d-%m-%Y') }}
-                    </strong>
-                </div>
-
-                <div class="detail-item">
-                    <span>Versi Instrumen</span>
-                    <strong>
-                        {{ sesi.versi_instrumen or 'Belum dikonfirmasi' }}
-                    </strong>
-                </div>
-            </div>
-
-            <div class="status">
-                <strong>Belum ada hasil tes yang diolah.</strong>
-                <p>
-                    Sesi ini masih berupa draf. Data hasil pemeriksaan,
-                    perhitungan, dan profil kemampuan akan ditambahkan
-                    setelah pedoman instrumen dipastikan.
-                </p>
-            </div>
-
-            <div class="form-actions">
-                <a
-                    href="{{ url_for('asesmen_binet', anak_id=sesi.anak_id) }}"
-                    class="button-secondary"
-                >
-                    Kembali
-                </a>
-            </div>
-        </section>
-
-        <footer class="footer">
-            Sistem Pendukung Keputusan · SDN Burengan 5
-        </footer>
-    </main>
-</body>
-</html>
+            fetch('/asesmen-binet/sesi/' + asesmenId + '/skor', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function () {
+                window.location.reload();
+            })
+            .catch(function (err) {
+                console.error('Gagal memperbarui item:', err);
+                window.location.reload();
+            });
+        });
+    });
+</script>
+{% endblock %}

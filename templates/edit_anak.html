@@ -1,109 +1,104 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
 
-    <title>Edit Data Anak | Ruang Arah</title>
+{% block title %}Edit Data Anak | Ruang Arah{% endblock %}
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
-</head>
+{% block header_title %}Edit Data Anak{% endblock %}
+{% block header_subtitle %}Perbarui informasi profil anak yang tersimpan di database{% endblock %}
 
-<body>
-    <header class="header">
-        <div class="container header-content">
-            <div class="brand">
-                Ruang Arah
-                <small>SPK Strategi Pengajaran ABK</small>
+{% block content %}
+<div class="max-w-2xl space-y-6">
+
+    <!-- BACK BUTTON -->
+    <div>
+        <a href="{{ url_for('data_anak') }}" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-sky-700 bg-white px-3.5 py-2 rounded-xl border border-slate-200/80 shadow-sm transition-all hover:-translate-x-0.5">
+            <i class="fa-solid fa-arrow-left text-[11px]"></i>
+            <span>Kembali ke Data Anak</span>
+        </a>
+    </div>
+
+    <!-- FORM CARD -->
+    <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 soft-shadow space-y-6">
+        <div class="border-b border-slate-100 pb-4">
+            <div class="inline-block px-3 py-1 bg-sky-50 rounded-full text-[11px] font-semibold text-sky-800 border border-sky-100 mb-2">
+                SDN Burengan 5 &middot; Edit Data Anak
             </div>
-
-            <a href="{{ url_for('data_anak') }}" class="back-link">
-                ← Kembali ke Data Anak
-            </a>
+            <h3 class="font-display font-bold text-slate-800 text-lg">
+                Edit Profil: {{ anak.nama_panggilan }}
+            </h3>
+            <p class="text-xs text-slate-400">
+                Kolom bertanda <span class="text-rose-500 font-bold">*</span> wajib diisi.
+            </p>
         </div>
-    </header>
 
-    <main class="container main">
-        <p class="eyebrow">Pengelolaan Data</p>
+        {% if pesan_error %}
+            <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-3">
+                <i class="fa-solid fa-circle-exclamation text-base"></i>
+                <div>{{ pesan_error }}</div>
+            </div>
+        {% endif %}
 
-        <h1>Edit Data Anak</h1>
-
-        <p class="description">
-            Perbarui informasi anak yang sudah tersimpan
-            dalam database.
-        </p>
-
-        <section class="form-card">
-            <div class="form-heading">
-                <h2>Informasi Anak</h2>
-                <p>Periksa kembali data sebelum menyimpan perubahan.</p>
+        <form action="{{ url_for('edit_anak', anak_id=anak.id) }}" method="POST" class="space-y-5 text-xs">
+            <div>
+                <label for="kode_anak" class="block font-semibold text-slate-700 mb-1.5">
+                    Kode Anak <span class="text-rose-500 font-bold">*</span>
+                </label>
+                <input
+                    type="text"
+                    id="kode_anak"
+                    name="kode_anak"
+                    maxlength="20"
+                    required
+                    value="{{ request.form.get('kode_anak', anak.kode_anak) }}"
+                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 transition-all"
+                >
             </div>
 
-            {% if pesan_error %}
-                <div class="error-box" role="alert">
-                    {{ pesan_error }}
-                </div>
-            {% endif %}
+            <div>
+                <label for="nama_panggilan" class="block font-semibold text-slate-700 mb-1.5">
+                    Nama Panggilan <span class="text-rose-500 font-bold">*</span>
+                </label>
+                <input
+                    type="text"
+                    id="nama_panggilan"
+                    name="nama_panggilan"
+                    maxlength="50"
+                    required
+                    value="{{ request.form.get('nama_panggilan', anak.nama_panggilan) }}"
+                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 transition-all"
+                >
+            </div>
 
-            <form
-                action="{{ url_for('edit_anak', anak_id=anak.id) }}"
-                method="POST"
-            >
-                <div class="form-group">
-                    <label for="kode_anak">Kode Anak</label>
+            <div>
+                <label for="tanggal_lahir" class="block font-semibold text-slate-700 mb-1.5">
+                    Tanggal Lahir <span class="text-rose-500 font-bold">*</span>
+                </label>
+                <input
+                    type="date"
+                    id="tanggal_lahir"
+                    name="tanggal_lahir"
+                    required
+                    value="{{ request.form.get('tanggal_lahir', anak.tanggal_lahir.strftime('%Y-%m-%d')) }}"
+                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs focus:outline-none focus:bg-white focus:border-sky-400 transition-all"
+                >
+            </div>
 
-                    <input
-                        type="text"
-                        id="kode_anak"
-                        name="kode_anak"
-                        maxlength="20"
-                        required
-                        value="{{ request.form.get('kode_anak', anak.kode_anak) }}"
-                    >
-                </div>
+            <div class="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
+                <a
+                    href="{{ url_for('data_anak') }}"
+                    class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-2xl text-xs transition-colors"
+                >
+                    Batal
+                </a>
+                <button
+                    type="submit"
+                    class="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-2xl text-xs shadow-md shadow-sky-600/20 transition-all flex items-center gap-2"
+                >
+                    <i class="fa-solid fa-floppy-disk text-xs"></i>
+                    <span>Simpan Perubahan</span>
+                </button>
+            </div>
+        </form>
+    </div>
 
-                <div class="form-group">
-                    <label for="nama_panggilan">Nama Panggilan</label>
-
-                    <input
-                        type="text"
-                        id="nama_panggilan"
-                        name="nama_panggilan"
-                        maxlength="50"
-                        required
-                        value="{{ request.form.get('nama_panggilan', anak.nama_panggilan) }}"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="tanggal_lahir">Tanggal Lahir</label>
-
-                    <input
-                        type="date"
-                        id="tanggal_lahir"
-                        name="tanggal_lahir"
-                        required
-                        value="{{ request.form.get('tanggal_lahir', anak.tanggal_lahir.strftime('%Y-%m-%d')) }}"
-                    >
-                </div>
-
-                <div class="form-actions">
-                    <a
-                        href="{{ url_for('data_anak') }}"
-                        class="button-secondary"
-                    >
-                        Batal
-                    </a>
-
-                    <button type="submit" class="button-primary">
-                        Simpan Perubahan
-                    </button>
-                </div>
-            </form>
-        </section>
-    </main>
-</body>
-</html>
+</div>
+{% endblock %}
